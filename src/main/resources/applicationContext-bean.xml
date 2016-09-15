@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd" 
+        >
+
+    <context:component-scan base-package="com.noahark.mapping">
+      <context:exclude-filter type="regex" expression="com.noahark.mapping.controller.*"/>      
+    </context:component-scan>
+
+ 
+    <!-- 鐢ㄤ簬鎸佹湁ApplicationContext,鍙互浣跨敤SpringContextHolder.getBean('xxxx')鐨勯潤鎬佹柟娉曞緱鍒皊pring bean瀵硅薄 -->
+    <!--  
+    <bean class="com.xxl.app.base.SpringContextHolder" lazy-init="false" />
+    -->
+     
+    <!-- 寮曞叆閰嶇疆鏂囦欢 -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+     
+    <!--鍒涘缓jdbc鏁版嵁婧�-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+      <property name="driverClassName" value="${driver}"/>
+      <property name="url" value="${url}"/>
+      <property name="username" value="${jdbc.user}"/>
+      <property name="password" value="${jdbc.password}"/>
+      <property name="maxActive" value="${maxActive}"/>
+      <property name="maxIdle" value="${maxIdle}"/>
+      <property name="minIdle" value="${minIdle}"/>
+    </bean>
+     
+    <!-- spring鍜孧yBatis瀹岀編鏁村悎锛屼笉闇�mybatis鐨勯厤缃槧灏勬枃浠�-->  
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+        <property name="dataSource" ref="dataSource" />  
+        <!-- 鑷姩鎵弿mapping.xml鏂囦欢 -->  
+        <property name="mapperLocations" value="classpath:com/noahark/mapping/mapping/*.xml"></property>  
+    </bean>
+     
+    
+    <!-- DAO鎺ュ彛鎵�湪鍖呭悕锛孲pring浼氳嚜鍔ㄦ煡鎵惧叾涓嬬殑绫�-->  
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage" value="com.noahark.mapping.dao" />  
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>  
+    </bean>
+        
+ 
+ 	<!-- 浣跨敤annotation娉ㄨВ鏂瑰紡閰嶇疆浜嬪姟 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />    
+    <!-- 浣跨敤JDBC浜嬪姟 -->  
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    
+    <!-- 声明式事务 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="remove*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="select*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="find*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+			
+			<tx:method name="*" propagation="SUPPORTS" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 事务通知 -->
+	<aop:config>
+		<aop:advisor
+			pointcut="execution(public * com.noahark.mapping.service.impl.*Impl.*(..))"
+			advice-ref="txAdvice" />
+	</aop:config>
+    	
+    <bean class="com.noahark.mapping.util.SpringUtils"/>
+
+    <import resource="classpath:spring-config-cache.xml"/>
+    <import resource="classpath:spring-config-shiro.xml"/>
+    
+</beans>

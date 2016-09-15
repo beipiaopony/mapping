@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.noahark.mapping.dao.ITaskDao" >
+  <resultMap id="BaseResultMap" type="com.noahark.mapping.bean.TaskJob" >
+    <id column="JOB_ID" property="job_id" jdbcType="INTEGER" />
+    <result column="MAP_SET_ID" property="map_set_id" jdbcType="INTEGER" />
+    <result column="DEPENDENCY_JOB_ID" property="dependency_job_id" jdbcType="INTEGER" />
+    <result column="CMD_ID" property="cmd_id" jdbcType="INTEGER" />    
+    <result column="YEAR_FROM" property="year" jdbcType="VARCHAR" />
+    <result column="PERIOD_FROM" property="period" jdbcType="VARCHAR" />
+    <result column="ENTITY_FROM" property="entity" jdbcType="VARCHAR" />
+    <result column="SCENARIO_FROM" property="scenario" jdbcType="VARCHAR" />
+    <result column="VIEW_FROM" property="view" jdbcType="VARCHAR" />
+    <result column="PARAMS" property="params" jdbcType="VARCHAR" />
+    <result column="USER_ID" property="user_id" jdbcType="VARCHAR" />
+    <result column="USER_NAME" property="user" jdbcType="VARCHAR" />
+    <result column="IP" property="ip" jdbcType="VARCHAR" />
+    <result column="TIME_BEGIN" property="job_start_time" jdbcType="DATE" />
+    <result column="STATE" property="status" jdbcType="INTEGER" />    
+  </resultMap>
+  
+  <resultMap id="QueryResultMap" type="com.noahark.mapping.bean.TaskJob" >
+    <id column="JOB_ID" property="job_id" jdbcType="INTEGER" />
+    <result column="MAP_SET_NAME" property="map_set_name" jdbcType="VARCHAR" />
+    <result column="CMD_SCRIPT" property="cmd_script" jdbcType="VARCHAR" />
+    <result column="YEAR_FROM" property="year" jdbcType="VARCHAR" />
+    <result column="PERIOD_FROM" property="period" jdbcType="VARCHAR" />
+    <result column="ENTITY_FROM" property="entity" jdbcType="VARCHAR" />
+    <result column="SCENARIO_FROM" property="scenario" jdbcType="VARCHAR" />
+    <result column="VIEW_FROM" property="view" jdbcType="VARCHAR" />
+    <result column="PARAMS" property="params" jdbcType="VARCHAR" />
+    <result column="USER_NAME" property="user" jdbcType="VARCHAR" />
+    <result column="TIME_BEGIN" property="start_time" jdbcType="DATE" />
+    <result column="TIME_END" property="end_time" jdbcType="DATE" />
+    <result column="STATE" property="status" jdbcType="INTEGER" />    
+    <result column="MESSAGE" property="message" jdbcType="VARCHAR" /> 
+  </resultMap>
+  
+  <insert id="insert" parameterType="com.noahark.mapping.bean.TaskJob">
+        insert into T_TRANS_JOB (JOB_ID,MAP_SET_ID,CMD_ID,YEAR_FROM,PERIOD_FROM,ENTITY_FROM,SCENARIO_FROM,USER_ID,USER_NAME,STATE,IP,TIME_BEGIN,PARAMS,APPLICATION)
+        values(S_T_TRANS_JOB.nextval,#{map_set_id},#{cmd_id},
+               #{year},#{period},#{entity},#{scenario},#{user_id},#{user},
+               #{status},#{ip},sysdate,#{params,jdbcType=VARCHAR},#{application,jdbcType=VARCHAR})
+  </insert>
+  
+  <select id="countTasks" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(*)
+		from T_TRANS_JOB a 
+		inner join T_MAP_SET b on a.MAP_SET_ID = b.MAP_SET_CODE 
+		inner join T_PROJ_USER u on a.USER_ID = u.USERID
+		left join T_TRANS_COMMAND c on a.MAP_SET_ID = c.MAP_SET_ID and a.CMD_ID = c.CMD_ID 
+		
+		where  a.APPLICATION = #{appName,jdbcType=VARCHAR} 
+		 
+		    <if test="userRole!='ADMIN'">
+		        and  a.user_name = #{userName,jdbcType=VARCHAR} 
+		    </if> 
+		
+		    <if test="year!=null and year!=''">
+                and a.YEAR_FROM =  #{year,jdbcType=VARCHAR} 
+            </if>
+            <if test="month!=null and month!=''">
+                and a.PERIOD_FROM = #{month,jdbcType=VARCHAR}
+            </if>
+            <if test="tableid!=null and tableid!=0">
+                and a.MAP_SET_ID = #{tableid,jdbcType=INTEGER}
+            </if>
+            
+            <if test="entity!=null and entity!=''">
+                and a.ENTITY_FROM like #{entity,jdbcType=VARCHAR}
+            </if> 
+
+  </select>
+  
+  <select id="queryTaskList" resultMap="QueryResultMap" parameterType="java.util.Map">
+        select * from (
+        select T.*,ROWNUM RN from (
+		      select a.job_id,
+		       b.MAP_SET_NAME,
+		       c.CMD_SCRIPT,
+		       a.YEAR_FROM,
+		       a.PERIOD_FROM,
+		       a.ENTITY_FROM,
+		       a.SCENARIO_FROM,
+		       a.VIEW_FROM,
+		       a.PARAMS,
+		       nvl(a.user_name,u.LOGINNAME) as user_name,
+		       to_char(a.TIME_BEGIN,'YYYY-MM-dd HH24:MI:SS') TIME_BEGIN,
+		       to_char(a.TIME_END,'YYYY-MM-dd HH24:MI:SS') TIME_END,
+		       a.STATE,
+		       nvl(a.MEMO,a.ERROR_INFO) as message
+		from T_TRANS_JOB a 
+		inner join T_MAP_SET b on a.MAP_SET_ID = b.MAP_SET_CODE 
+		inner join T_PROJ_USER u on a.USER_ID = u.USERID
+		left join T_TRANS_COMMAND c on a.MAP_SET_ID = c.MAP_SET_ID and a.CMD_ID = c.CMD_ID 
+		
+		where  a.APPLICATION = #{appName,jdbcType=VARCHAR} 
+		
+		    <if test="userRole!='ADMIN'">
+		        and  a.user_name = #{userName,jdbcType=VARCHAR} 
+		    </if>
+		    
+		    <if test="year!=null and year!=''">
+                and a.YEAR_FROM =  #{year,jdbcType=VARCHAR} 
+            </if>
+            <if test="month!=null and month!=''">
+                and a.PERIOD_FROM = #{month,jdbcType=VARCHAR}
+            </if>
+            <if test="tableid!=null and tableid!=0">
+                and a.MAP_SET_ID = #{tableid,jdbcType=INTEGER}
+            </if>
+            
+            <if test="entity!=null and entity!=''">
+                and a.ENTITY_FROM like #{entity,jdbcType=VARCHAR}
+            </if>            
+		
+		 order by case when a.TIME_END is null then a.STATE else -1 end desc, a.TIME_END desc ) T WHERE ROWNUM &lt;= #{END,jdbcType=INTEGER} ) 
+		 where RN &gt; #{START,jdbcType=INTEGER} 
+		 
+  </select>
+  
+  <!--  
+  <sql id="Base_Column_List" >
+    user_id, user_name, user_pwd, user_email
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user
+    where user_id = #{id,jdbcType=INTEGER}
+  </select>
+  -->
+  <!--  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from user_t
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.cn.hnust.pojo.User" >
+    insert into user_t (id, user_name, password, 
+      age)
+    values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{age,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cn.hnust.pojo.User" >
+    insert into user_t
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cn.hnust.pojo.User" >
+    update user_t
+    <set >
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cn.hnust.pojo.User" >
+    update user_t
+    set user_name = #{userName,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      age = #{age,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  -->
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" 
+"http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd" >
+<log4j:configuration>
+
+	<!-- 控制台输出日志信息 -->
+	<appender name="consoleAppender" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH\:mm\:ss,SSS} [%l]-[%5p] %m%n" />
+		</layout>
+	</appender>
+
+	<!-- 每天产生一个日志文件 -->
+	<appender name="fileAppender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="logs/ssm.log" />
+		<param name="append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<param name="encoding" value="UTF-8" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH\:mm\:ss,SSS} [%c]-[%p] %m%n" />
+		</layout>
+	</appender>
+
+
+
+	<logger name="file" additivity="true">
+		<level value="INFO" />
+		<appender-ref ref="fileAppender" />
+	</logger>
+
+	<!-- 下面是打印Mybatis语句的配置 -->
+	<logger name="com.ibatis" additivity="true">
+		<level value="info" />
+	</logger>
+	
+	<logger name="java.sql.Connection" additivity="true">
+		<level value="info" />
+	</logger>
+	
+	<logger name="java.sql.Statement" additivity="true">
+		<level value="info" />
+	</logger>
+	
+	<logger name="java.sql.PreparedStatement" additivity="true">
+		<level value="info" />
+	</logger>
+	
+	<logger name="java.sql.ResultSet" additivity="true">
+		<level value="info" />
+	</logger>
+	
+	<!-- essbaseLog  
+    <logger name="com.picc.budget.util.EssbaseUtils" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="essbaseLog" />
+    </logger>
+    
+    <logger name="com.picc.budget.util.HyperionUtils" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="essbaseLog" />
+    </logger>
+    -->
+	<!-- interface 
+    <logger name="com.picc.budget.web.YsifController" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="interfaceLog" />
+    </logger>
+    
+    <logger name="com.picc.budget.queue.BusinessYS2BXTask" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="interfaceLog" />
+    </logger>
+    
+    <logger name="com.picc.budget.queue.BusinessFBReceiver" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="interfaceLog" />
+    </logger>
+    
+    <logger name="com.picc.budget.queue.BusinessIFReceiver" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="interfaceLog" />
+    </logger>
+    
+    <logger name="com.picc.budget.webservice.publish.ysif" additivity="false">
+        <level value="debug" />
+        <appender-ref ref="interfaceLog" />
+    </logger>
+	-->
+	<root>
+		<!-- 控制日志输出级别 -->
+		<priority value="DEBUG" />
+		<appender-ref ref="consoleAppender" />
+		<appender-ref ref="fileAppender"/>				<!-- 将日志信息输入至文件中 -->
+	</root>
+
+</log4j:configuration>
