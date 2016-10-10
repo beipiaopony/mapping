@@ -32,6 +32,13 @@
 					<th data-options="field:'period',width:40">月份</th>
 					<th data-options="field:'entity',width:100,align:'center'">组织</th>
 					<th data-options="field:'scenario',width:80">情景</th>
+					<th data-options="field:'params',width:80,formatter:function(value,row,index){
+					if(value==1){
+					  return '合并'
+					} else {
+					  return '替换'
+					}
+					}">加载模式</th>
 					<th data-options="field:'map_set_name',width:180">上传报表</th>					
 					<th data-options="field:'start_time',width:140">作业启动时间</th>
 					<th data-options="field:'end_time',width:140">作业完成时间</th>	

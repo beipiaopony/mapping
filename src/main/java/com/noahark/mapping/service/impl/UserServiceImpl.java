@@ -73,7 +73,8 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public String getUserRole(String appName, String user) {
-		int count = userDao.selectRoleByUserName(appName, user);
+		String app = "HFM:" + appName.toUpperCase();
+		int count = userDao.selectRoleByUserName(app, user);
 		if (count > 0 ) {
 			return IUserDao.APPLICATION_ADMIN;
 		} else {

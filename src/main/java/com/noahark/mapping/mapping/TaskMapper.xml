@@ -80,7 +80,7 @@
 		       c.CMD_SCRIPT,
 		       a.YEAR_FROM,
 		       a.PERIOD_FROM,
-		       a.ENTITY_FROM,
+		       case when a.ENTITY_FROM = 'admin' then 'all companies' else a.ENTITY_FROM end as ENTITY_FROM,
 		       a.SCENARIO_FROM,
 		       a.VIEW_FROM,
 		       a.PARAMS,

@@ -47,8 +47,8 @@ public class UploadDataController extends BaseController {
 			@PathVariable String userName) {
 
 		
-		System.out.println("appName=" + appName);
-		System.out.println("userName=" + userName);
+		logger.debug("appName=" + appName);
+		logger.debug("userName=" + userName);
 		
 		String user = getUserName(userName);
 		String role = userService.getUserRole(appName, user);
@@ -107,11 +107,13 @@ public class UploadDataController extends BaseController {
 		parameters.put("appName", appName);
 		parameters.put("userRole", role);
 		
-		System.out.println("appName=" + appName);
-		System.out.println("userName=" + userName);
-		System.out.println("role=" + role);
+		logger.debug("appName=" + appName);
+		logger.debug("userName=" + userName);
+		logger.debug("role=" + role);
 		
+		//System.out.println("user role = "  + role);
 		if (userService.isAdmin(role)){
+			
 			return organizationService.getOrganizationList(parameters);
 		} else {
 			return organizationService.getOrganizationListByUser(parameters);
@@ -141,8 +143,12 @@ public class UploadDataController extends BaseController {
 		String month = request.getParameter("uploadMonth");
 		String scenario = request.getParameter("uploadScenario");
 		String[] tables = request.getParameterValues("uploadTables");
-		String model = request.getParameter("uploadModel");
 		
+		String model = "2";
+		if (!entity.equals("admin")){			
+			model = request.getParameter("uploadModel");
+		}
+				
 
 		for (int i = 0; i < tables.length; i++) {
 			TaskJob job = new TaskJob();

@@ -24,7 +24,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
 		
 		List<Organization> list  = organizationDao.queryOrganizations(parameter);		
 		
-		list.add(0, new Organization(-1,"admin","admin","admin"));
+		list.add(list.size(), new Organization(-1,"admin","all companies","all companies"));
 
 		return list;
 	}
