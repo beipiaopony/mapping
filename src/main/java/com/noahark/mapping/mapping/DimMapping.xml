@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.noahark.mapping.dao.IMappingDao" >
+  <resultMap id="OtherDimMapping" type="com.noahark.mapping.bean.OtherDimMapper" >
+    <id column="DIM_CODE_MAP_ID" property="mapId" jdbcType="INTEGER" />     
+    <result column="DETAIL_TYPE" property="detailType" jdbcType="VARCHAR" />
+    <result column="DIM_TYPE" property="dimType" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE" property="detailCode" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE_NAME" property="detailName" jdbcType="VARCHAR" />
+    <result column="DIM_CODE" property="dimCode" jdbcType="VARCHAR" />
+    <result column="DIM_CODE_NAME" property="dimName" jdbcType="VARCHAR" />
+    <result column="CREATED" property="createDate" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="AccountMapping" type="com.noahark.mapping.bean.AccountMapper" >
+    <id column="ACCOUNT_MAP_ID" property="mapId" jdbcType="INTEGER" />
+    <result column="ACCOUNT_CODE_FROM" property="fromAccountCode" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_NAME_FROM" property="fromAccountName" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_CODE_TO" property="toAccountCode" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_NAME_TO" property="toAccountName" jdbcType="VARCHAR" />
+    <result column="COEF" property="coef" jdbcType="INTEGER" />
+    <result column="DATA_FETCH" property="dataFetch" jdbcType="INTEGER" />
+    <result column="DATA_TYPE" property="dataType" jdbcType="INTEGER" />
+    <result column="CURRENCY_TYPE" property="currency" jdbcType="INTEGER" />    
+    <result column="DETAIL_CODE1" property="detailCode1" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE2" property="detailCode2" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE3" property="detailCode3" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE4" property="detailCode4" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE5" property="detailCode5" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE6" property="detailCode6" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE7" property="detailCode7" jdbcType="VARCHAR" />
+    <result column="DETAIL_CODE8" property="detailCode8" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME1" property="detailName1" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME2" property="detailName2" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME3" property="detailName3" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME4" property="detailName4" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME5" property="detailName5" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME6" property="detailName6" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME7" property="detailName7" jdbcType="VARCHAR" />
+    <result column="DETAIL_NAME8" property="detailName8" jdbcType="VARCHAR" />
+    <result column="DIM_01" property="dim01" jdbcType="VARCHAR" />
+    <result column="DIM_02" property="dim02" jdbcType="VARCHAR" />
+    <result column="DIM_03" property="dim03" jdbcType="VARCHAR" />
+    <result column="DIM_04" property="dim04" jdbcType="VARCHAR" />
+    <result column="DIM_05" property="dim05" jdbcType="VARCHAR" />
+    <result column="DIM_06" property="dim06" jdbcType="VARCHAR" />
+    <result column="DIM_07" property="dim07" jdbcType="VARCHAR" />
+    <result column="DIM_08" property="dim08" jdbcType="VARCHAR" />
+    <result column="DIM_09" property="dim09" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_01" property="dimName01" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_02" property="dimName02" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_03" property="dimName03" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_04" property="dimName04" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_05" property="dimName05" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_06" property="dimName06" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_07" property="dimName07" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_08" property="dimName08" jdbcType="VARCHAR" />
+    <result column="DIM_NAME_09" property="dimName09" jdbcType="VARCHAR" />
+    <result column="CREATED" property="createDate" jdbcType="VARCHAR" /> 
+  </resultMap>
+  
+  <insert id="insertOtherDimMapping" parameterType="com.noahark.mapping.bean.OtherDimMapper">
+        INSERT INTO T_MAP_DIMCODE(DIM_CODE_MAP_ID,MAP_SET_CODE,DIM_TYPE,DETAIL_TYPE,DIM_CODE,DETAIL_CODE,CREATED)
+              VALUES(S_T_MAP_DIMCODE.nextval,
+                     #{mapSetId},#{dimType},#{detailType},#{dimCode},#{detailCode},sysdate)
+  </insert>
+  
+  <update id="updateOtherDimMapping" parameterType="com.noahark.mapping.bean.OtherDimMapper">
+       update T_MAP_DIMCODE set DIM_CODE = #{dimCode}, CREATED = sysdate where DIM_CODE_MAP_ID = #{mapId}
+  </update>  
+  
+  
+  <select id="querySingleDimMapping" resultMap="OtherDimMapping" parameterType="java.util.Map">
+		      select A.DETAIL_TYPE,A.DIM_TYPE, B.DIM_CODE_MAP_ID, B.DETAIL_CODE, E.DETAIL_CODE_NAME,B.DIM_CODE, D.DIM_CODE_NAME, 
+					to_char(B.CREATED,'YYYY-MM-dd HH24:MI:SS') CREATED
+					from T_MAP_DIMTYPE A 
+					INNER JOIN T_MAP_DIMCODE B ON A.DIM_TYPE = B.DIM_TYPE AND A.DETAIL_TYPE = B.DETAIL_TYPE 
+					LEFT JOIN T_FROM_DETAILCODE E ON A.DETAIL_TYPE = E.DETAIL_TYPE AND B.DETAIL_CODE = E.DETAIL_CODE AND E.ACCOUNT_SET_CODE = 1
+					LEFT JOIN T_TO_DIMCODE D ON A.DIM_TYPE = D.DIM_TYPE AND B.DIM_CODE = D.DIM_CODE AND D.APP_SET_CODE = 1
+					where  A.map_set_code = 1
+					  AND  B.MAP_SET_CODE = 1 
+					  AND  A.DETAIL_TYPE  = #{DETAIL,jdbcType=VARCHAR} 
+			          AND  A.DIM_TYPE     = #{DIM,jdbcType=VARCHAR}   
+			          AND  B.DETAIL_CODE  = #{CODE,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="querySingleAccMapping" resultMap="AccountMapping" parameterType="java.util.Map">
+		    SELECT 
+			A.ACCOUNT_MAP_ID,
+			A.ACCOUNT_CODE_FROM,
+			A.ACCOUNT_CODE_TO,
+			A.COEF,
+			A.DATA_FETCH,
+			A.DATA_TYPE,
+			A.CURRENCY_TYPE,
+			A.DETAIL_CODE1,
+			A.DETAIL_CODE2,
+			A.DETAIL_CODE3,
+			A.DETAIL_CODE4,
+			A.DETAIL_CODE5,
+			A.DETAIL_CODE6,
+			A.DETAIL_CODE7,
+			A.DETAIL_CODE8,
+			A.DIM_01,
+			A.DIM_02,
+			A.DIM_03,
+			A.DIM_04,
+			A.DIM_05,
+			A.DIM_06,
+			A.DIM_07,
+			A.DIM_08,
+			A.DIM_09,
+			to_char(a.CREATED,'YYYY-MM-dd HH24:MI:SS') CREATED 			
+			FROM T_MAP_ACCOUNT A
+
+			WHERE A.MAP_SET_CODE = 1    
+			  and A.ACCOUNT_CODE_FROM = #{FROM_ACCOUNT,jdbcType=VARCHAR}
+			  and A.ACCOUNT_CODE_TO = #{TO_ACCOUNT,jdbcType=VARCHAR} 
+  </select>
+  
+  <update id="updateAccountMapping" parameterType="com.noahark.mapping.bean.AccountMapper">
+       update T_MAP_ACCOUNT
+       <set>
+           <if test="mapSetId != null" >
+               CREATED = sysdate,
+           </if>
+           <if test="coef != null" >
+	           COEF = #{coef},
+	       </if>
+           <if test="dataFetch != null" >
+	           DATA_FETCH = #{dataFetch},
+	       </if>
+           <if test="dataType != null" >
+	           DATA_TYPE = #{dataType},
+	       </if>
+           <if test="currency != null" >
+	           CURRENCY_TYPE = #{currency},
+	       </if>
+	       <choose>
+		       <when test="detailCode1 != null and detailCode1 != ''" >
+		           DETAIL_TYPE1 = 'Detail_02',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE1 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE1 = #{detailCode1},
+	       </if>
+	       <choose>
+		       <when test="detailCode2 != null and detailCode2 != ''" >
+		           DETAIL_TYPE2 = 'Detail_03',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE2 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE2 = #{detailCode2},
+	       </if>
+	       <choose>
+		       <when test="detailCode3 != null and detailCode3 != ''" >
+		           DETAIL_TYPE3 = 'Detail_04',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE3 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE3 = #{detailCode3},
+	       </if>
+	       <choose>
+		       <when test="detailCode4 != null and detailCode4 != ''" >
+		           DETAIL_TYPE4 = 'Detail_05',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE4 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE4 = #{detailCode4},
+	       </if>
+	       <choose>
+		       <when test="detailCode5 != null and detailCode5 != ''" >
+		           DETAIL_TYPE5 = 'Detail_06',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE5 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE5 = #{detailCode5},
+	       </if>
+	       <choose>
+		       <when test="detailCode6 != null and detailCode6 != ''" >
+		           DETAIL_TYPE6 = 'Detail_07',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE6 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE6 = #{detailCode6},
+	       </if>
+	       <choose>
+		       <when test="detailCode7 != null and detailCode7 != ''" >
+		           DETAIL_TYPE7 = 'Detail_08',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE7 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE7 = #{detailCode7},
+	       </if>
+	       <choose>
+		       <when test="detailCode8 != null and detailCode8 != ''" >
+		           DETAIL_TYPE8 = 'Detail_09',
+		       </when>
+		       <otherwise>
+		           DETAIL_TYPE8 = '',
+		       </otherwise>
+	       </choose>
+           <if test="mapSetId != null" >
+	           DETAIL_CODE8 = #{detailCode8},
+	       </if>
+	       
+	       <if test="mapSetId != null" >
+               DIM_01 = #{dim01},
+           </if>
+           <if test="mapSetId != null" >
+               DIM_02 = #{dim02},
+           </if>
+           <if test="mapSetId != null" >
+               DIM_03 = #{dim03},
+           </if>
+           <if test="mapSetId != null" >
+               DIM_04 = #{dim04},
+           </if>
+           <if test="mapSetId != null" >
+               DIM_05 = #{dim05},
+           </if>
+           <if test="mapSetId != null" >
+               DIM_06 = #{dim06},
+           </if>
+           <if test="mapSetId != null" >
+               DIM_07 = #{dim07},
+           </if>
+           <if test="mapSetId != null" >
+               DIM_08 = #{dim08},
+           </if>
+       </set>
+        where ACCOUNT_MAP_ID = #{mapId}
+  </update>
+  
+  <insert id="insertAccountMapping" parameterType="com.noahark.mapping.bean.AccountMapper">
+      insert into T_MAP_ACCOUNT
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mapSetId != null" >
+        ACCOUNT_MAP_ID,
+      </if>
+      <if test="mapSetId != null" >
+        MAP_SET_CODE,
+      </if>
+      <if test="mapSetId != null" >
+        CREATED,
+      </if>
+      <if test="coef != null" >
+        COEF,
+      </if>
+      <if test="dataFetch != null" >
+        DATA_FETCH,
+      </if>
+      <if test="dataType != null" >
+        DATA_TYPE,
+      </if>
+      <if test="currency != null" >
+        CURRENCY_TYPE,
+      </if>
+      <if test="fromAccountCode != null" >
+        ACCOUNT_CODE_FROM,
+      </if>
+      <if test="toAccountCode != null" >
+        ACCOUNT_CODE_TO,
+      </if>
+      <if test="detailCode1 != null" >
+        DETAIL_TYPE1,
+      </if>
+      <if test="detailCode1 != null" >
+        DETAIL_CODE1,
+      </if>
+      <if test="detailCode2 != null" >
+        DETAIL_TYPE2,
+      </if>
+      <if test="detailCode2 != null" >
+        DETAIL_CODE2,
+      </if>
+      <if test="detailCode3 != null" >
+        DETAIL_TYPE3,
+      </if>
+      <if test="detailCode3 != null" >
+        DETAIL_CODE3,
+      </if>
+      <if test="detailCode4 != null" >
+        DETAIL_TYPE4,
+      </if>
+      <if test="detailCode4 != null" >
+        DETAIL_CODE4,
+      </if>
+      <if test="detailCode5 != null" >
+        DETAIL_TYPE5,
+      </if>
+      <if test="detailCode5 != null" >
+        DETAIL_CODE5,
+      </if>
+      <if test="detailCode6 != null" >
+        DETAIL_TYPE6,
+      </if>
+      <if test="detailCode6 != null" >
+        DETAIL_CODE6,
+      </if>
+      <if test="detailCode7 != null" >
+        DETAIL_TYPE7,
+      </if>
+      <if test="detailCode7 != null" >
+        DETAIL_CODE7,
+      </if>
+      <if test="detailCode8 != null" >
+        DETAIL_TYPE8,
+      </if>
+      <if test="detailCode8 != null" >
+        DETAIL_CODE8,
+      </if>
+      <if test="dim01 != null" >
+        DIM_01,
+      </if>
+      <if test="dim02 != null" >
+        DIM_02,
+      </if>
+      <if test="dim03 != null" >
+        DIM_03,
+      </if>
+      <if test="dim04 != null" >
+        DIM_04,
+      </if>
+      <if test="dim05 != null" >
+        DIM_05,
+      </if>
+      <if test="dim06 != null" >
+        DIM_06,
+      </if>
+      <if test="dim07 != null" >
+        DIM_07,
+      </if>
+      <if test="dim08 != null" >
+        DIM_08,
+      </if>
+      <if test="dim09 != null" >
+        DIM_09,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mapSetId != null" >
+        S_T_MAP_ACCOUNT.nextval,
+      </if>
+      <if test="mapSetId != null" >
+        MAP_SET_CODE,
+      </if>
+      <if test="mapSetId != null" >
+        sysdate,
+      </if>
+      <if test="coef != null" >
+        #{coef},
+      </if>
+      <if test="dataFetch != null" >
+        #{dataFetch},
+      </if>
+      <if test="dataType != null" >
+        #{dataType},
+      </if>
+      <if test="currency != null" >
+        #{currency},
+      </if>
+      <if test="fromAccountCode != null" >
+        #{fromAccountCode},
+      </if>
+      <if test="toAccountCode != null" >
+        #{toAccountCode},
+      </if>
+      <if test="detailCode1 != null" >
+        'Detail_02',
+      </if>
+      <if test="detailCode1 != null" >
+        #{detailCode1},
+      </if>
+      <if test="detailCode2 != null" >
+        'Detail_03',
+      </if>
+      <if test="detailCode2 != null" >
+        #{detailCode2},
+      </if>
+      <if test="detailCode3 != null" >
+        'Detail_04',
+      </if>
+      <if test="detailCode3 != null" >
+        #{detailCode3},
+      </if>
+      <if test="detailCode4 != null" >
+        'Detail_05',
+      </if>
+      <if test="detailCode4 != null" >
+        #{detailCode4},
+      </if>
+      <if test="detailCode5 != null" >
+        'Detail_06',
+      </if>
+      <if test="detailCode5 != null" >
+        #{detailCode5},
+      </if>
+      <if test="detailCode6 != null" >
+        'Detail_07',
+      </if>
+      <if test="detailCode6 != null" >
+        #{detailCode6},
+      </if>
+      <if test="detailCode7 != null" >
+        'Detail_08',
+      </if>
+      <if test="detailCode7 != null" >
+        #{detailCode7},
+      </if>
+      <if test="detailCode8 != null" >
+        'Detail_09',
+      </if>
+      <if test="detailCode8 != null" >
+        #{detailCode8},
+      </if>
+      <if test="dim01 != null" >
+        #{dim01},
+      </if>
+      <if test="dim02 != null" >
+        #{dim02},
+      </if>
+      <if test="dim03 != null" >
+        #{dim03},
+      </if>
+      <if test="dim04 != null" >
+        #{dim04},
+      </if>
+      <if test="dim05 != null" >
+        #{dim05},
+      </if>
+      <if test="dim06 != null" >
+        #{dim06},
+      </if>
+      <if test="dim07 != null" >
+        #{dim07},
+      </if>
+      <if test="dim08 != null" >
+        #{dim08},
+      </if>
+      <if test="dim09 != null" >
+        #{dim09},
+      </if>
+    </trim>  
+  </insert>
+  
+  <select id="countOtherDimMapping" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(*) 
+			from T_MAP_DIMTYPE A 
+			INNER JOIN T_MAP_DIMCODE B ON A.DIM_TYPE = B.DIM_TYPE AND A.DETAIL_TYPE = B.DETAIL_TYPE 
+			where  A.map_set_code = 1
+			  AND  B.MAP_SET_CODE = 1
+			  AND  A.DETAIL_TYPE  = #{DETAIL,jdbcType=VARCHAR} 
+			  AND  A.DIM_TYPE     = #{DIM,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="countAccountMapping" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(*)
+		FROM T_MAP_ACCOUNT A
+		WHERE A.MAP_SET_CODE = 1
+  </select>
+  
+  <select id="queryOtherDimMappingAll" resultType="java.util.HashMap" parameterType="java.util.Map">
+		      select A.DETAIL_TYPE,A.DIM_TYPE, B.DIM_CODE_MAP_ID, B.DETAIL_CODE, E.DETAIL_CODE_NAME,B.DIM_CODE, D.DIM_CODE_NAME, 
+					to_char(B.CREATED,'YYYY-MM-dd HH24:MI:SS') CREATED
+					from T_MAP_DIMTYPE A 
+					INNER JOIN T_MAP_DIMCODE B ON A.DIM_TYPE = B.DIM_TYPE AND A.DETAIL_TYPE = B.DETAIL_TYPE 
+					LEFT JOIN T_FROM_DETAILCODE E ON A.DETAIL_TYPE = E.DETAIL_TYPE AND B.DETAIL_CODE = E.DETAIL_CODE AND E.ACCOUNT_SET_CODE = 1
+					LEFT JOIN T_TO_DIMCODE D ON A.DIM_TYPE = D.DIM_TYPE AND B.DIM_CODE = D.DIM_CODE AND D.APP_SET_CODE = 1
+					where  A.map_set_code = 1
+					  AND  B.MAP_SET_CODE = 1 
+					  AND  A.DETAIL_TYPE  = #{DETAIL,jdbcType=VARCHAR} 
+			          AND  A.DIM_TYPE     = #{DIM,jdbcType=VARCHAR}   
+			          
+					ORDER BY B.DETAIL_CODE ,B.DIM_CODE
+  </select>
+  
+  <select id="queryOtherDimMapping" resultMap="OtherDimMapping" parameterType="java.util.Map">
+        select * from (
+        select T.*,ROWNUM RN from (
+		      select A.DETAIL_TYPE,A.DIM_TYPE, B.DIM_CODE_MAP_ID, B.DETAIL_CODE, E.DETAIL_CODE_NAME,B.DIM_CODE, D.DIM_CODE_NAME, 
+					to_char(B.CREATED,'YYYY-MM-dd HH24:MI:SS') CREATED
+					from T_MAP_DIMTYPE A 
+					INNER JOIN T_MAP_DIMCODE B ON A.DIM_TYPE = B.DIM_TYPE AND A.DETAIL_TYPE = B.DETAIL_TYPE 
+					LEFT JOIN T_FROM_DETAILCODE E ON A.DETAIL_TYPE = E.DETAIL_TYPE AND B.DETAIL_CODE = E.DETAIL_CODE AND E.ACCOUNT_SET_CODE = 1
+					LEFT JOIN T_TO_DIMCODE D ON A.DIM_TYPE = D.DIM_TYPE AND B.DIM_CODE = D.DIM_CODE AND D.APP_SET_CODE = 1
+					where  A.map_set_code = 1
+					  AND  B.MAP_SET_CODE = 1 
+					  AND  A.DETAIL_TYPE  = #{DETAIL,jdbcType=VARCHAR} 
+			          AND  A.DIM_TYPE     = #{DIM,jdbcType=VARCHAR}   
+			          
+					ORDER BY B.DETAIL_CODE ,B.DIM_CODE ) T WHERE ROWNUM &lt;= #{END,jdbcType=INTEGER} ) 
+		 where RN &gt; #{START,jdbcType=INTEGER} 
+		 
+  </select>
+  
+  <select id="queryAccountMappingAll" resultType="java.util.HashMap" parameterType="java.util.Map">
+		    SELECT 
+			A.ACCOUNT_MAP_ID,
+			A.ACCOUNT_CODE_FROM,
+			B.ACCOUNT_NAME ACCOUNT_NAME_FROM,
+			A.ACCOUNT_CODE_TO,
+			C.ACCOUNT_NAME ACCOUNT_NAME_TO,
+			A.COEF,
+			A.DATA_FETCH,
+			case A.DATA_FETCH when 0 then '期初余额' when 1 then '借方发生额' when 2 then '贷方发生额' when 3 then '期末余额' when 4 then '借方-贷方发生额' when 5 then '贷方-借方发生额' else '' end as 	DATA_FETCH_NAME,		
+			A.DATA_TYPE,
+		    case A.DATA_TYPE when 0 then '金额' when 1 then '数量' when 2 then '单价' else '' end DATA_TYPE_NAME, 		
+			A.CURRENCY_TYPE,
+		    case A.CURRENCY_TYPE when 0 then '本位币' when 1 then '原币' else '' end as CURRENCY_TYPE_NAME,		
+			A.DETAIL_CODE1,
+			d1.DETAIL_CODE_NAME as DETAIL_NAME1,
+			A.DETAIL_CODE2,
+			d2.DETAIL_CODE_NAME as DETAIL_NAME2,
+			A.DETAIL_CODE3,
+			d3.DETAIL_CODE_NAME as DETAIL_NAME3,
+			A.DETAIL_CODE4,
+			d4.DETAIL_CODE_NAME as DETAIL_NAME4,
+			A.DETAIL_CODE5,
+			d5.DETAIL_CODE_NAME as DETAIL_NAME5,
+			A.DETAIL_CODE6,
+			d6.DETAIL_CODE_NAME as DETAIL_NAME6,
+			A.DETAIL_CODE7,
+			d7.DETAIL_CODE_NAME as DETAIL_NAME7,
+			A.DETAIL_CODE8,
+			d8.DETAIL_CODE_NAME as DETAIL_NAME8,
+			A.DIM_01,
+			t1.DIM_CODE_NAME as DIM_NAME_01,
+			A.DIM_02,
+			t2.DIM_CODE_NAME as DIM_NAME_02,
+			A.DIM_03,
+			t3.DIM_CODE_NAME as DIM_NAME_03,
+			A.DIM_04,
+			t4.DIM_CODE_NAME as DIM_NAME_04,
+			A.DIM_05,
+			t5.DIM_CODE_NAME as DIM_NAME_05,
+			A.DIM_06,
+			t6.DIM_CODE_NAME as DIM_NAME_06,
+			A.DIM_07,
+			t7.DIM_CODE_NAME as DIM_NAME_07,
+			A.DIM_08,
+			t8.DIM_CODE_NAME as DIM_NAME_08,
+			A.DIM_09,
+			t9.DIM_CODE_NAME as DIM_NAME_09,
+			to_char(a.CREATED,'YYYY-MM-dd HH24:MI:SS') CREATED
+			
+			FROM T_MAP_ACCOUNT A
+			left join T_FROM_ACCOUNT B ON A.MAP_SET_CODE = B.ACCOUNT_SET_CODE AND A.ACCOUNT_CODE_FROM = B.ACCOUNT_CODE
+			LEFT JOIN T_TO_ACCOUNT   C ON A.MAP_SET_CODE = C.APP_SET_CODE AND A.ACCOUNT_CODE_TO = C.ACCOUNT_CODE
+			left join T_FROM_DETAILCODE d1 on a.MAP_SET_CODE = d1.ACCOUNT_SET_CODE and a.DETAIL_CODE1 = d1.DETAIL_CODE and d1.DETAIL_TYPE = 'Detail_02'
+			left join T_FROM_DETAILCODE d2 on a.MAP_SET_CODE = d2.ACCOUNT_SET_CODE and a.DETAIL_CODE2 = d2.DETAIL_CODE and d2.DETAIL_TYPE = 'Detail_03'
+			left join T_FROM_DETAILCODE d3 on a.MAP_SET_CODE = d3.ACCOUNT_SET_CODE and a.DETAIL_CODE3 = d3.DETAIL_CODE and d3.DETAIL_TYPE = 'Detail_04'
+			left join T_FROM_DETAILCODE d4 on a.MAP_SET_CODE = d4.ACCOUNT_SET_CODE and a.DETAIL_CODE4 = d4.DETAIL_CODE and d4.DETAIL_TYPE = 'Detail_05'
+			left join T_FROM_DETAILCODE d5 on a.MAP_SET_CODE = d5.ACCOUNT_SET_CODE and a.DETAIL_CODE5 = d5.DETAIL_CODE and d5.DETAIL_TYPE = 'Detail_06'
+			left join T_FROM_DETAILCODE d6 on a.MAP_SET_CODE = d6.ACCOUNT_SET_CODE and a.DETAIL_CODE6 = d6.DETAIL_CODE and d6.DETAIL_TYPE = 'Detail_07'
+			left join T_FROM_DETAILCODE d7 on a.MAP_SET_CODE = d7.ACCOUNT_SET_CODE and a.DETAIL_CODE7 = d7.DETAIL_CODE and d7.DETAIL_TYPE = 'Detail_08'
+			left join T_FROM_DETAILCODE d8 on a.MAP_SET_CODE = d8.ACCOUNT_SET_CODE and a.DETAIL_CODE8 = d8.DETAIL_CODE and d8.DETAIL_TYPE = 'Detail_09'
+			
+			left join T_TO_DIMCODE  t1 on a.MAP_SET_CODE = t1.APP_SET_CODE and a.DIM_01 = t1.DIM_CODE and t1.DIM_TYPE = 'Dim_01'
+			left join T_TO_DIMCODE  t2 on a.MAP_SET_CODE = t2.APP_SET_CODE and a.DIM_02 = t2.DIM_CODE and t2.DIM_TYPE = 'Dim_02'
+			left join T_TO_DIMCODE  t3 on a.MAP_SET_CODE = t3.APP_SET_CODE and a.DIM_03 = t3.DIM_CODE and t3.DIM_TYPE = 'Dim_03'
+			left join T_TO_DIMCODE  t4 on a.MAP_SET_CODE = t4.APP_SET_CODE and a.DIM_04 = t4.DIM_CODE and t4.DIM_TYPE = 'Dim_04'
+			left join T_TO_DIMCODE  t5 on a.MAP_SET_CODE = t5.APP_SET_CODE and a.DIM_05 = t5.DIM_CODE and t5.DIM_TYPE = 'Dim_05'
+			left join T_TO_DIMCODE  t6 on a.MAP_SET_CODE = t6.APP_SET_CODE and a.DIM_06 = t6.DIM_CODE and t6.DIM_TYPE = 'Dim_06'
+			left join T_TO_DIMCODE  t7 on a.MAP_SET_CODE = t7.APP_SET_CODE and a.DIM_07 = t7.DIM_CODE and t7.DIM_TYPE = 'Dim_07'
+			left join T_TO_DIMCODE  t8 on a.MAP_SET_CODE = t8.APP_SET_CODE and a.DIM_08 = t8.DIM_CODE and t8.DIM_TYPE = 'Dim_08'
+			left join T_TO_DIMCODE  t9 on a.MAP_SET_CODE = t9.APP_SET_CODE and a.DIM_09 = t9.DIM_CODE and t9.DIM_TYPE = 'Dim_09'
+			
+			WHERE A.MAP_SET_CODE = 1      
+		
+		 order by A.ACCOUNT_CODE_FROM,A.ACCOUNT_CODE_TO
+  </select>
+  
+  <select id="queryAccountMapping" resultMap="AccountMapping" parameterType="java.util.Map">
+        select * from (
+        select T.*,ROWNUM RN from (
+		    SELECT 
+			A.ACCOUNT_MAP_ID,
+			A.ACCOUNT_CODE_FROM,
+			B.ACCOUNT_NAME ACCOUNT_NAME_FROM,
+			A.ACCOUNT_CODE_TO,
+			C.ACCOUNT_NAME ACCOUNT_NAME_TO,
+			A.COEF,
+			A.DATA_FETCH,
+			A.DATA_TYPE,
+			A.CURRENCY_TYPE,
+			A.DETAIL_CODE1,
+			d1.DETAIL_CODE_NAME as DETAIL_NAME1,
+			A.DETAIL_CODE2,
+			d2.DETAIL_CODE_NAME as DETAIL_NAME2,
+			A.DETAIL_CODE3,
+			d3.DETAIL_CODE_NAME as DETAIL_NAME3,
+			A.DETAIL_CODE4,
+			d4.DETAIL_CODE_NAME as DETAIL_NAME4,
+			A.DETAIL_CODE5,
+			d5.DETAIL_CODE_NAME as DETAIL_NAME5,
+			A.DETAIL_CODE6,
+			d6.DETAIL_CODE_NAME as DETAIL_NAME6,
+			A.DETAIL_CODE7,
+			d7.DETAIL_CODE_NAME as DETAIL_NAME7,
+			A.DETAIL_CODE8,
+			d8.DETAIL_CODE_NAME as DETAIL_NAME8,
+			A.DIM_01,
+			t1.DIM_CODE_NAME as DIM_NAME_01,
+			A.DIM_02,
+			t2.DIM_CODE_NAME as DIM_NAME_02,
+			A.DIM_03,
+			t3.DIM_CODE_NAME as DIM_NAME_03,
+			A.DIM_04,
+			t4.DIM_CODE_NAME as DIM_NAME_04,
+			A.DIM_05,
+			t5.DIM_CODE_NAME as DIM_NAME_05,
+			A.DIM_06,
+			t6.DIM_CODE_NAME as DIM_NAME_06,
+			A.DIM_07,
+			t7.DIM_CODE_NAME as DIM_NAME_07,
+			A.DIM_08,
+			t8.DIM_CODE_NAME as DIM_NAME_08,
+			A.DIM_09,
+			t9.DIM_CODE_NAME as DIM_NAME_09,
+			to_char(a.CREATED,'YYYY-MM-dd HH24:MI:SS') CREATED
+			
+			FROM T_MAP_ACCOUNT A
+			left join T_FROM_ACCOUNT B ON A.MAP_SET_CODE = B.ACCOUNT_SET_CODE AND A.ACCOUNT_CODE_FROM = B.ACCOUNT_CODE
+			LEFT JOIN T_TO_ACCOUNT   C ON A.MAP_SET_CODE = C.APP_SET_CODE AND A.ACCOUNT_CODE_TO = C.ACCOUNT_CODE
+			left join T_FROM_DETAILCODE d1 on a.MAP_SET_CODE = d1.ACCOUNT_SET_CODE and a.DETAIL_CODE1 = d1.DETAIL_CODE and d1.DETAIL_TYPE = 'Detail_02'
+			left join T_FROM_DETAILCODE d2 on a.MAP_SET_CODE = d2.ACCOUNT_SET_CODE and a.DETAIL_CODE2 = d2.DETAIL_CODE and d2.DETAIL_TYPE = 'Detail_03'
+			left join T_FROM_DETAILCODE d3 on a.MAP_SET_CODE = d3.ACCOUNT_SET_CODE and a.DETAIL_CODE3 = d3.DETAIL_CODE and d3.DETAIL_TYPE = 'Detail_04'
+			left join T_FROM_DETAILCODE d4 on a.MAP_SET_CODE = d4.ACCOUNT_SET_CODE and a.DETAIL_CODE4 = d4.DETAIL_CODE and d4.DETAIL_TYPE = 'Detail_05'
+			left join T_FROM_DETAILCODE d5 on a.MAP_SET_CODE = d5.ACCOUNT_SET_CODE and a.DETAIL_CODE5 = d5.DETAIL_CODE and d5.DETAIL_TYPE = 'Detail_06'
+			left join T_FROM_DETAILCODE d6 on a.MAP_SET_CODE = d6.ACCOUNT_SET_CODE and a.DETAIL_CODE6 = d6.DETAIL_CODE and d6.DETAIL_TYPE = 'Detail_07'
+			left join T_FROM_DETAILCODE d7 on a.MAP_SET_CODE = d7.ACCOUNT_SET_CODE and a.DETAIL_CODE7 = d7.DETAIL_CODE and d7.DETAIL_TYPE = 'Detail_08'
+			left join T_FROM_DETAILCODE d8 on a.MAP_SET_CODE = d8.ACCOUNT_SET_CODE and a.DETAIL_CODE8 = d8.DETAIL_CODE and d8.DETAIL_TYPE = 'Detail_09'
+			
+			left join T_TO_DIMCODE  t1 on a.MAP_SET_CODE = t1.APP_SET_CODE and a.DIM_01 = t1.DIM_CODE and t1.DIM_TYPE = 'Dim_01'
+			left join T_TO_DIMCODE  t2 on a.MAP_SET_CODE = t2.APP_SET_CODE and a.DIM_02 = t2.DIM_CODE and t2.DIM_TYPE = 'Dim_02'
+			left join T_TO_DIMCODE  t3 on a.MAP_SET_CODE = t3.APP_SET_CODE and a.DIM_03 = t3.DIM_CODE and t3.DIM_TYPE = 'Dim_03'
+			left join T_TO_DIMCODE  t4 on a.MAP_SET_CODE = t4.APP_SET_CODE and a.DIM_04 = t4.DIM_CODE and t4.DIM_TYPE = 'Dim_04'
+			left join T_TO_DIMCODE  t5 on a.MAP_SET_CODE = t5.APP_SET_CODE and a.DIM_05 = t5.DIM_CODE and t5.DIM_TYPE = 'Dim_05'
+			left join T_TO_DIMCODE  t6 on a.MAP_SET_CODE = t6.APP_SET_CODE and a.DIM_06 = t6.DIM_CODE and t6.DIM_TYPE = 'Dim_06'
+			left join T_TO_DIMCODE  t7 on a.MAP_SET_CODE = t7.APP_SET_CODE and a.DIM_07 = t7.DIM_CODE and t7.DIM_TYPE = 'Dim_07'
+			left join T_TO_DIMCODE  t8 on a.MAP_SET_CODE = t8.APP_SET_CODE and a.DIM_08 = t8.DIM_CODE and t8.DIM_TYPE = 'Dim_08'
+			left join T_TO_DIMCODE  t9 on a.MAP_SET_CODE = t9.APP_SET_CODE and a.DIM_09 = t9.DIM_CODE and t9.DIM_TYPE = 'Dim_09'
+			
+			WHERE A.MAP_SET_CODE = 1      
+		
+		 order by A.ACCOUNT_CODE_FROM,A.ACCOUNT_CODE_TO ) T WHERE ROWNUM &lt;= #{END,jdbcType=INTEGER} ) 
+		 where RN &gt; #{START,jdbcType=INTEGER} 
+		 
+  </select>
+  
+  <!--  
+  <sql id="Base_Column_List" >
+    user_id, user_name, user_pwd, user_email
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user
+    where user_id = #{id,jdbcType=INTEGER}
+  </select>
+  -->
+  <!--  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from user_t
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.cn.hnust.pojo.User" >
+    insert into user_t (id, user_name, password, 
+      age)
+    values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{age,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cn.hnust.pojo.User" >
+    insert into user_t
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="age != null" >
+        age,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null" >
+        #{age,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cn.hnust.pojo.User" >
+    update user_t
+    <set >
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cn.hnust.pojo.User" >
+    update user_t
+    set user_name = #{userName,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      age = #{age,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  -->
+</mapper>

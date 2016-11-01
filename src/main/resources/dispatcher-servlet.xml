@@ -110,7 +110,13 @@
 			</map>
 		</property>
 	</bean>
-    
+	
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+        <property name="defaultEncoding" value="utf-8"></property>   
+        <property name="maxUploadSize" value="10485760000"></property>  
+        <property name="maxInMemorySize" value="40960"></property>  
+   </bean>
+   
     <!-- 默认访问跳转到登录页面(即定义无需Controller的url<->view直接映射) -->  
     <mvc:view-controller path="/" view-name="forward:/login.jsp"/>
     
@@ -138,9 +144,10 @@
 
     <bean class="com.noahark.mapping.exception.DefaultExceptionHandler"/>
  
+    <!--  
     <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
         <property name="securityManager" ref="securityManager"/>
     </bean>
-    
+    -->
  
 </beans>

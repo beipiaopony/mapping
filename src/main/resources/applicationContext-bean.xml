@@ -85,7 +85,9 @@
     	
     <bean class="com.noahark.mapping.util.SpringUtils"/>
 
+<!--  
     <import resource="classpath:spring-config-cache.xml"/>
     <import resource="classpath:spring-config-shiro.xml"/>
+    -->
     
 </beans>

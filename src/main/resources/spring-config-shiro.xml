@@ -120,6 +120,7 @@
                 /css/**  = anon
                 /js/**  = anon
                 /images/**  = anon
+                /metadata/** = anon
             </value>
         </property>
     </bean>
