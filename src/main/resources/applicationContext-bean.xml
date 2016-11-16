@@ -54,13 +54,33 @@
         
  
  	<!-- 浣跨敤annotation娉ㄨВ鏂瑰紡閰嶇疆浜嬪姟 -->
-    <tx:annotation-driven transaction-manager="transactionManager" />    
+ 	<!--  
+    <tx:annotation-driven transaction-manager="transactionManager" /> 
+    -->   
     <!-- 浣跨敤JDBC浜嬪姟 -->  
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
         <property name="dataSource" ref="dataSource" />
     </bean>
+  
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">  
+      <tx:attributes>            
+          <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
+		  <tx:method name="save*" propagation="REQUIRED" rollback-for="Exception"/>
+		  <tx:method name="remove*" propagation="REQUIRED" rollback-for="Exception"/>
+		  <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+		  <tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception"/> 
+      </tx:attributes>  
+  </tx:advice>  
+  
+  <aop:config expose-proxy="true" proxy-target-class="true">  
+      <!-- 只对业务逻辑层实施事务 -->  
+      <aop:pointcut id="txPointcut" expression="execution(public * com.noahark.mapping.service.impl.*.*(..))"/>  
+      <aop:advisor id="txAdvisor" advice-ref="txAdvice" pointcut-ref="txPointcut"/>  
+  </aop:config>
     
     <!-- 声明式事务 -->
+    <!--  
+    <tx:method name="*" propagation="REQUIRED" rollback-for="Exception"/> 
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="add*" propagation="REQUIRED" />
@@ -75,13 +95,14 @@
 			<tx:method name="*" propagation="SUPPORTS" read-only="true" />
 		</tx:attributes>
 	</tx:advice>
-
+    -->
 	<!-- 事务通知 -->
-	<aop:config>
-		<aop:advisor
-			pointcut="execution(public * com.noahark.mapping.service.impl.*Impl.*(..))"
-			advice-ref="txAdvice" />
+	<!--
+	<aop:config>		
+			<aop:pointcut expression="execution(* com.noahark.mapping.service.impl.*.*(..))"  id="txPointCut"/>			
+			<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
 	</aop:config>
+    -->
     	
     <bean class="com.noahark.mapping.util.SpringUtils"/>
 

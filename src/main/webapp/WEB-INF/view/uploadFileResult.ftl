@@ -15,10 +15,10 @@
         <h2>处理结果</h2>
 		<div class="demo-info">
 			<div class="demo-tip icon-tip"></div>
-			<div>${message}</div>
+            <div>${message!""}</div>
 		</div>
 		<div style="margin:10px 0;">
-			<a href="${userName!"null"}" class="easyui-linkbutton" data-options="iconCls:'icon-back'">返回</a>
+			<a href="../../query/${appName!"null"}/${userName!"null"}" class="easyui-linkbutton" data-options="iconCls:'icon-back'">返回</a>
 		</div>
 	
 	</body>

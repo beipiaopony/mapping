@@ -12,6 +12,23 @@
     <result column="CREATED" property="createDate" jdbcType="VARCHAR" />
   </resultMap>
   
+  <resultMap id="IntegrationProdMapping" type="com.noahark.mapping.bean.OtherDimMapper" >
+    <id column="ERP_PRO_CODE" property="detailCode" jdbcType="VARCHAR" />
+    <result column="ERP_PRO_NAME" property="detailName" jdbcType="VARCHAR" />
+    <result column="HFM_PRO_CODE" property="dimCode" jdbcType="VARCHAR" />
+    <result column="HFM_PRO_NAME" property="dimName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="IntegrationAccMapping" type="com.noahark.mapping.bean.IntegrationAccMapping" >
+    <id column="ERP_ACCOUNT" property="erpAccountCode" jdbcType="VARCHAR" />
+    <result column="ERP_ACCOUNT_NAME" property="erpAccountName" jdbcType="VARCHAR" />
+    <result column="HFM_ACCOUNT" property="hfmAccountCode" jdbcType="VARCHAR" />
+    <result column="HFM_ACCOUNT_NAME" property="hfmAccountName" jdbcType="VARCHAR" />
+    <result column="PLATE" property="plate" jdbcType="VARCHAR" />
+    <result column="DATATYPE" property="dataType" jdbcType="VARCHAR" />
+  </resultMap>
+   
+  
   <resultMap id="AccountMapping" type="com.noahark.mapping.bean.AccountMapper" >
     <id column="ACCOUNT_MAP_ID" property="mapId" jdbcType="INTEGER" />
     <result column="ACCOUNT_CODE_FROM" property="fromAccountCode" jdbcType="VARCHAR" />
@@ -59,6 +76,28 @@
     <result column="CREATED" property="createDate" jdbcType="VARCHAR" /> 
   </resultMap>
   
+  <insert id="insertInteProdMapping" parameterType="com.noahark.mapping.bean.OtherDimMapper">
+        INSERT INTO T_YTH_PRODUCT(ERP_PRO_CODE,ERP_PRO_NAME,HFM_PRO_CODE,HFM_PRO_NAME)
+              VALUES(#{detailCode},#{detailName},#{dimCode},#{dimName})
+  </insert>
+  
+  <update id="updateInteProdMapping" parameterType="com.noahark.mapping.bean.OtherDimMapper">
+       update T_YTH_PRODUCT set ERP_PRO_NAME = #{detailName} , HFM_PRO_CODE = #{dimCode}, HFM_PRO_NAME = #{dimName} where ERP_PRO_CODE = #{detailCode}
+  </update>
+  
+  <insert id="insertInteAccMapping" parameterType="com.noahark.mapping.bean.IntegrationAccMapping">
+        INSERT INTO T_YTH_ACCOUNT(ERP_ACCOUNT,ERP_ACCOUNT_NAME,HFM_ACCOUNT,HFM_ACCOUNT_NAME,PLATE,DATATYPE)              
+              VALUES(#{erpAccountCode},#{erpAccountName},#{hfmAccountCode},#{hfmAccountName},#{plate},#{dataType})
+  </insert>
+  
+  <update id="updateInteAccMapping" parameterType="com.noahark.mapping.bean.IntegrationAccMapping">
+       update T_YTH_ACCOUNT set ERP_ACCOUNT_NAME = #{erpAccountName} , HFM_ACCOUNT_NAME = #{hfmAccountName} 
+        where ERP_ACCOUNT = #{erpAccountCode} 
+            and HFM_ACCOUNT = #{hfmAccountCode} 
+            and PLATE = #{plate}
+            and DATATYPE = #{dataType}
+  </update>  
+  
   <insert id="insertOtherDimMapping" parameterType="com.noahark.mapping.bean.OtherDimMapper">
         INSERT INTO T_MAP_DIMCODE(DIM_CODE_MAP_ID,MAP_SET_CODE,DIM_TYPE,DETAIL_TYPE,DIM_CODE,DETAIL_CODE,CREATED)
               VALUES(S_T_MAP_DIMCODE.nextval,
@@ -68,6 +107,19 @@
   <update id="updateOtherDimMapping" parameterType="com.noahark.mapping.bean.OtherDimMapper">
        update T_MAP_DIMCODE set DIM_CODE = #{dimCode}, CREATED = sysdate where DIM_CODE_MAP_ID = #{mapId}
   </update>  
+  
+  
+  <select id="querySingleInteProdMapping" resultMap="IntegrationProdMapping" parameterType="java.util.Map">
+          select ERP_PRO_CODE,ERP_PRO_NAME,HFM_PRO_CODE,HFM_PRO_NAME from T_YTH_PRODUCT where ERP_PRO_CODE = #{PRODUCT,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="querySingleInteAccMapping" resultMap="IntegrationAccMapping" parameterType="com.noahark.mapping.bean.IntegrationAccMapping">
+          select ERP_ACCOUNT,ERP_ACCOUNT_NAME,HFM_ACCOUNT,HFM_ACCOUNT_NAME,PLATE,DATATYPE from T_YTH_ACCOUNT 
+          where ERP_ACCOUNT = #{erpAccountCode} 
+            and HFM_ACCOUNT = #{hfmAccountCode} 
+            and PLATE = #{plate}
+            and DATATYPE = #{dataType}
+  </select>
   
   
   <select id="querySingleDimMapping" resultMap="OtherDimMapping" parameterType="java.util.Map">
@@ -116,7 +168,24 @@
 			WHERE A.MAP_SET_CODE = 1    
 			  and A.ACCOUNT_CODE_FROM = #{FROM_ACCOUNT,jdbcType=VARCHAR}
 			  and A.ACCOUNT_CODE_TO = #{TO_ACCOUNT,jdbcType=VARCHAR} 
+			  and A.DETAIL_CODE6 = #{MAP_TABLE,jdbcType=VARCHAR}
   </select>
+  
+  <delete id="removeAccMapping" >
+     delete from T_MAP_ACCOUNT WHERE MAP_SET_CODE = 1
+  </delete>
+  
+  <delete id="removeDimMapping" >
+     delete from T_MAP_DIMCODE WHERE MAP_SET_CODE = 1
+  </delete>
+  
+  <delete id="removeInteProdMapping" >
+     delete from T_YTH_PRODUCT 
+  </delete>
+  
+  <delete id="removeInteAccMapping" >
+     delete from T_YTH_ACCOUNT
+  </delete>
   
   <update id="updateAccountMapping" parameterType="com.noahark.mapping.bean.AccountMapper">
        update T_MAP_ACCOUNT
@@ -364,7 +433,7 @@
         S_T_MAP_ACCOUNT.nextval,
       </if>
       <if test="mapSetId != null" >
-        MAP_SET_CODE,
+        #{mapSetId},
       </if>
       <if test="mapSetId != null" >
         sysdate,
@@ -465,14 +534,51 @@
     </trim>  
   </insert>
   
+  <select id="countInteProdMapping" resultType="java.lang.Integer" parameterType="java.util.Map">
+          select count(*) from T_YTH_PRODUCT 
+  </select>
+  
+  <select id="queryAllInteProdMapping" resultType="java.util.HashMap" parameterType="java.util.Map">
+          select ERP_PRO_CODE,ERP_PRO_NAME,HFM_PRO_CODE,HFM_PRO_NAME from T_YTH_PRODUCT order by ERP_PRO_CODE
+  </select>
+  
+  <select id="queryInteProdMapping" resultMap="IntegrationProdMapping" parameterType="java.util.Map">
+    select * from (
+       select T.*,ROWNUM RN from (
+          select ERP_PRO_CODE,ERP_PRO_NAME,HFM_PRO_CODE,HFM_PRO_NAME from T_YTH_PRODUCT order by ERP_PRO_CODE ) T          
+       WHERE ROWNUM &lt;= #{END,jdbcType=INTEGER} )
+    where RN &gt; #{START,jdbcType=INTEGER}   
+  </select>
+  
+  
+  <select id="countInteAccMapping" resultType="java.lang.Integer" parameterType="java.util.Map">
+          select count(*) from T_YTH_ACCOUNT 
+  </select>
+  
+  <select id="queryAllInteAccMapping" resultType="java.util.HashMap" parameterType="java.util.Map">
+          select ERP_ACCOUNT,ERP_ACCOUNT_NAME,HFM_ACCOUNT,HFM_ACCOUNT_NAME,PLATE,DATATYPE from T_YTH_ACCOUNT order by ERP_ACCOUNT,HFM_ACCOUNT,PLATE,DATATYPE
+  </select>
+  
+  <select id="queryInteAccMapping" resultMap="IntegrationAccMapping" parameterType="java.util.Map">
+    select * from (
+       select T.*,ROWNUM RN from (
+          select ERP_ACCOUNT,ERP_ACCOUNT_NAME,HFM_ACCOUNT,HFM_ACCOUNT_NAME,PLATE,DATATYPE from T_YTH_ACCOUNT order by ERP_ACCOUNT,HFM_ACCOUNT,PLATE,DATATYPE ) T          
+       WHERE ROWNUM &lt;= #{END,jdbcType=INTEGER} )
+    where RN &gt; #{START,jdbcType=INTEGER}   
+  </select>
+  
   <select id="countOtherDimMapping" resultType="java.lang.Integer" parameterType="java.util.Map">
         select count(*) 
 			from T_MAP_DIMTYPE A 
 			INNER JOIN T_MAP_DIMCODE B ON A.DIM_TYPE = B.DIM_TYPE AND A.DETAIL_TYPE = B.DETAIL_TYPE 
 			where  A.map_set_code = 1
 			  AND  B.MAP_SET_CODE = 1
+			  <if test="DETAIL!=null and DETAIL!=''">
 			  AND  A.DETAIL_TYPE  = #{DETAIL,jdbcType=VARCHAR} 
+			  </if>
+			  <if test="DIM!=null and DIM!=''">
 			  AND  A.DIM_TYPE     = #{DIM,jdbcType=VARCHAR}
+			  </if>
   </select>
   
   <select id="countAccountMapping" resultType="java.lang.Integer" parameterType="java.util.Map">
@@ -490,10 +596,13 @@
 					LEFT JOIN T_TO_DIMCODE D ON A.DIM_TYPE = D.DIM_TYPE AND B.DIM_CODE = D.DIM_CODE AND D.APP_SET_CODE = 1
 					where  A.map_set_code = 1
 					  AND  B.MAP_SET_CODE = 1 
+					  <if test="DETAIL!=null and DETAIL!=''">
 					  AND  A.DETAIL_TYPE  = #{DETAIL,jdbcType=VARCHAR} 
+					  </if>
+					  <if test="DIM!=null and DIM!=''">
 			          AND  A.DIM_TYPE     = #{DIM,jdbcType=VARCHAR}   
-			          
-					ORDER BY B.DETAIL_CODE ,B.DIM_CODE
+			          </if>
+					ORDER BY A.DETAIL_TYPE,B.DETAIL_CODE ,B.DIM_CODE
   </select>
   
   <select id="queryOtherDimMapping" resultMap="OtherDimMapping" parameterType="java.util.Map">
@@ -507,10 +616,13 @@
 					LEFT JOIN T_TO_DIMCODE D ON A.DIM_TYPE = D.DIM_TYPE AND B.DIM_CODE = D.DIM_CODE AND D.APP_SET_CODE = 1
 					where  A.map_set_code = 1
 					  AND  B.MAP_SET_CODE = 1 
+					  <if test="DETAIL!=null and DETAIL!=''">
 					  AND  A.DETAIL_TYPE  = #{DETAIL,jdbcType=VARCHAR} 
+					  </if>
+					  <if test="DIM!=null and DIM!=''">
 			          AND  A.DIM_TYPE     = #{DIM,jdbcType=VARCHAR}   
-			          
-					ORDER BY B.DETAIL_CODE ,B.DIM_CODE ) T WHERE ROWNUM &lt;= #{END,jdbcType=INTEGER} ) 
+			          </if>
+					ORDER BY A.DETAIL_TYPE, B.DETAIL_CODE ,B.DIM_CODE ) T WHERE ROWNUM &lt;= #{END,jdbcType=INTEGER} ) 
 		 where RN &gt; #{START,jdbcType=INTEGER} 
 		 
   </select>

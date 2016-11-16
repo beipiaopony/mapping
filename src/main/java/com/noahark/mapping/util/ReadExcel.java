@@ -17,11 +17,58 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.noahark.mapping.bean.AccountMapper;
+import com.noahark.mapping.bean.IntegrationAccMapping;
 import com.noahark.mapping.bean.OtherDimMapper;
 
 public class ReadExcel {
 	
+	public static List<IntegrationAccMapping> readInteAccExcel(String path) throws IOException{
+		if (path == null || Common.EMPTY.equals(path)) {
+			return null;
+		} else {
+			String postfix = getPostfix(path);
+			
+			if (!Common.EMPTY.equals(postfix)) {
+				
+				if (Common.OFFICE_EXCEL_2003_POSTFIX.equals(postfix)) {
+					return readInteAccXls(path);
+				} else if (Common.OFFICE_EXCEL_2010_POSTFIX.equals(postfix)) {
+					return readInteAccXlsx(path);
+				}
+			} else {
+				
+				System.out.println(path + Common.NOT_EXCEL_FILE);
+				
+				return null;
+			}
+		}
 		
+		return null;
+	}	
+	
+	public static List<OtherDimMapper> readInteProdExcel(String path) throws IOException{
+		if (path == null || Common.EMPTY.equals(path)) {
+			return null;
+		} else {
+			String postfix = getPostfix(path);
+			
+			if (!Common.EMPTY.equals(postfix)) {
+				
+				if (Common.OFFICE_EXCEL_2003_POSTFIX.equals(postfix)) {
+					return readInteProdXls(path);
+				} else if (Common.OFFICE_EXCEL_2010_POSTFIX.equals(postfix)) {
+					return readInteProdXlsx(path);
+				}
+			} else {
+				
+				System.out.println(path + Common.NOT_EXCEL_FILE);
+				
+				return null;
+			}
+		}
+		
+		return null;
+	}
 	
 	public static List<OtherDimMapper> readDimExcel(String path) throws IOException{
 		if (path == null || Common.EMPTY.equals(path)) {
@@ -93,9 +140,15 @@ public class ReadExcel {
 		for (int rowNum = 1; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
 			XSSFRow xssfRow = xssfSheet.getRow(rowNum);
 			if (xssfRow != null) {
+				
+				String col1 = getValue(xssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
 				acc = new AccountMapper();
 
-				acc.setFromAccountCode(getValue(xssfRow.getCell(0)));
+				acc.setFromAccountCode(col1);
 				acc.setFromAccountName(getValue(xssfRow.getCell(1)));
 
 				acc.setToAccountCode(getValue(xssfRow.getCell(2)));
@@ -152,9 +205,16 @@ public class ReadExcel {
 			HSSFRow hssfRow = hssfSheet.getRow(rowNum);
 
 			if (hssfRow != null) {
+				
+				String col1 = getValue(hssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
+				
 				acc = new AccountMapper();
 
-				acc.setFromAccountCode(getValue(hssfRow.getCell(0)));
+				acc.setFromAccountCode(col1);
 				acc.setFromAccountName(getValue(hssfRow.getCell(1)));
 
 				acc.setToAccountCode(getValue(hssfRow.getCell(2)));
@@ -197,6 +257,76 @@ public class ReadExcel {
 
 	}
 
+	public static List<IntegrationAccMapping> readInteAccXlsx(String path) throws IOException {
+		InputStream is = new FileInputStream(path);
+		XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
+		IntegrationAccMapping dim;
+
+		List<IntegrationAccMapping> list = new ArrayList<IntegrationAccMapping>();
+
+		XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
+
+		for (int rowNum = 1; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
+			XSSFRow xssfRow = xssfSheet.getRow(rowNum);
+			if (xssfRow != null) {
+				
+				String col1 = getValue(xssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
+				
+				dim = new IntegrationAccMapping();
+
+				dim.setErpAccountCode(col1);
+				dim.setErpAccountName(getValue(xssfRow.getCell(1)));
+				dim.setHfmAccountCode(getValue(xssfRow.getCell(2)));
+				dim.setHfmAccountName(getValue(xssfRow.getCell(3)));
+				dim.setPlate(getValue(xssfRow.getCell(4)));
+				dim.setDataType(getValue(xssfRow.getCell(5)));
+				
+				list.add(dim);
+
+			}
+		}
+
+		return list;
+	}
+	
+	public static List<OtherDimMapper> readInteProdXlsx(String path) throws IOException {
+		InputStream is = new FileInputStream(path);
+		XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
+		OtherDimMapper dim;
+
+		List<OtherDimMapper> list = new ArrayList<OtherDimMapper>();
+
+		XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
+
+		for (int rowNum = 1; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
+			XSSFRow xssfRow = xssfSheet.getRow(rowNum);
+			if (xssfRow != null) {
+				
+				String col1 = getValue(xssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
+				
+				dim = new OtherDimMapper();
+
+				dim.setDetailCode(col1);
+				dim.setDetailName(getValue(xssfRow.getCell(1)));
+				dim.setDimCode(getValue(xssfRow.getCell(2)));
+				dim.setDimName(getValue(xssfRow.getCell(3)));
+
+				list.add(dim);
+
+			}
+		}
+
+		return list;
+	}
+	
 	public static List<OtherDimMapper> readDimXlsx(String path) throws IOException {
 		InputStream is = new FileInputStream(path);
 		XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
@@ -209,9 +339,16 @@ public class ReadExcel {
 		for (int rowNum = 1; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
 			XSSFRow xssfRow = xssfSheet.getRow(rowNum);
 			if (xssfRow != null) {
+				
+				String col1 = getValue(xssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
+				
 				dim = new OtherDimMapper();
 
-				dim.setDetailType(getValue(xssfRow.getCell(0)));
+				dim.setDetailType(col1);
 				dim.setDimType(getValue(xssfRow.getCell(1)));
 				dim.setDetailCode(getValue(xssfRow.getCell(2)));
 				dim.setDetailName(getValue(xssfRow.getCell(3)));
@@ -226,6 +363,72 @@ public class ReadExcel {
 		return list;
 	}
 
+	public static List<IntegrationAccMapping> readInteAccXls(String path) throws IOException {
+		InputStream is = new FileInputStream(path);
+		HSSFWorkbook hssfWorkbook = new HSSFWorkbook(is);
+
+		IntegrationAccMapping dim;
+
+		List<IntegrationAccMapping> list = new ArrayList<IntegrationAccMapping>();
+
+		HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(0);
+
+		for (int rowNum = 1; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
+			HSSFRow hssfRow = hssfSheet.getRow(rowNum);
+			if (hssfRow != null) {
+				
+				String col1 = getValue(hssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
+				
+				dim = new IntegrationAccMapping();
+				dim.setErpAccountCode(col1);
+				dim.setErpAccountName(getValue(hssfRow.getCell(1)));
+				dim.setHfmAccountCode(getValue(hssfRow.getCell(2)));
+				dim.setHfmAccountName(getValue(hssfRow.getCell(3)));
+				dim.setPlate(getValue(hssfRow.getCell(4)));
+				dim.setDataType(getValue(hssfRow.getCell(5)));
+				list.add(dim);
+			}
+		}
+
+		return list;
+	}
+	
+	public static List<OtherDimMapper> readInteProdXls(String path) throws IOException {
+		InputStream is = new FileInputStream(path);
+		HSSFWorkbook hssfWorkbook = new HSSFWorkbook(is);
+
+		OtherDimMapper dim;
+
+		List<OtherDimMapper> list = new ArrayList<OtherDimMapper>();
+
+		HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(0);
+
+		for (int rowNum = 1; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
+			HSSFRow hssfRow = hssfSheet.getRow(rowNum);
+			if (hssfRow != null) {
+				
+				String col1 = getValue(hssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
+				
+				dim = new OtherDimMapper();
+				dim.setDetailCode(col1);
+				dim.setDetailName(getValue(hssfRow.getCell(1)));
+				dim.setDimCode(getValue(hssfRow.getCell(2)));
+				dim.setDimName(getValue(hssfRow.getCell(3)));
+				list.add(dim);
+			}
+		}
+
+		return list;
+	}
+	
 	public static List<OtherDimMapper> readDimXls(String path) throws IOException {
 		InputStream is = new FileInputStream(path);
 		HSSFWorkbook hssfWorkbook = new HSSFWorkbook(is);
@@ -239,9 +442,15 @@ public class ReadExcel {
 		for (int rowNum = 1; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
 			HSSFRow hssfRow = hssfSheet.getRow(rowNum);
 			if (hssfRow != null) {
+				String col1 = getValue(hssfRow.getCell(0));
+				
+				if (col1 == null || col1.length() == 0){
+					continue;
+				}
+				
 				dim = new OtherDimMapper();
 
-				dim.setDetailType(getValue(hssfRow.getCell(0)));
+				dim.setDetailType(col1);
 				dim.setDimType(getValue(hssfRow.getCell(1)));
 				dim.setDetailCode(getValue(hssfRow.getCell(2)));
 				dim.setDetailName(getValue(hssfRow.getCell(3)));
@@ -263,7 +472,7 @@ public class ReadExcel {
 		if (xssfcell.getCellType() == xssfcell.CELL_TYPE_BOOLEAN) {
 			return String.valueOf(xssfcell.getBooleanCellValue());
 		} else if (xssfcell.getCellType() == xssfcell.CELL_TYPE_NUMERIC) {
-			return String.valueOf(xssfcell.getNumericCellValue());
+			return String.valueOf(Math.round(xssfcell.getNumericCellValue()));
 		} else {
 			return String.valueOf(xssfcell.getStringCellValue());
 		}
@@ -276,7 +485,7 @@ public class ReadExcel {
 		if (hssfCell.getCellType() == hssfCell.CELL_TYPE_BOOLEAN) {
 			return String.valueOf(hssfCell.getBooleanCellValue());
 		} else if (hssfCell.getCellType() == hssfCell.CELL_TYPE_NUMERIC) {
-			return String.valueOf(hssfCell.getNumericCellValue());
+			return String.valueOf(Math.round(hssfCell.getNumericCellValue()));
 		} else {
 			return String.valueOf(hssfCell.getStringCellValue());
 		}
